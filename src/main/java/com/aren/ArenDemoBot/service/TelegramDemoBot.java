@@ -62,6 +62,7 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
             Используйте международные коды валют, например RUB, EUR или USD.
             В дальнейшем курсы валют будут приводится к этой валюте.
             Изменить его можно будет по команде /profilecurrency.""";
+
     private static final List<String> DEFAULT_CURRENCIES = asList("USD", "RUB", "EUR", "GBP", "JPY", "CNY");
     private static final String REGISTRATION_SUCCESSFUL_TEXT = "Пользователь зарегистрирован!" + parseToUnicode(":tada:");
     private static final String CURRENCY_CHANGE_SUCCESSFUL_TEXT = "Валюта пользователя успешно изменена!" + parseToUnicode(":tada:") + "\n" +
@@ -83,16 +84,7 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
         this.currencyService = currencyService;
         this.config = config;
         // Create list of commands
-        List<BotCommand> listOfCommands = new ArrayList<>(asList(
-                new BotCommand(START_COMMAND, "Запуск бота и авторегистрация пользователя"),
-                new BotCommand(HELP_COMMAND, "Помощь"),
-                new BotCommand(CITY_COMMAND, "Установить город пользователя"),
-                new BotCommand(WEATHER_COMMAND_1, "Погода в твоем городе"),
-                new BotCommand(MY_CURRENCY_COMMAND, "Установить валюту пользователя"),
-                new BotCommand(STOCK_QUOTE_COMMAND_1, "Курсы валют"),
-                new BotCommand(DEFAULT_STOCK_COMMAND_1, "Получить курс основных валют"),
-                new BotCommand(UNREGISTER_COMMAND, "Удалить аккаунт пользователя")
-        ));
+        List<BotCommand> listOfCommands = getBotCommands();
         try {
             execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
@@ -485,4 +477,22 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
         return present;
     }
 
+    /**
+     * Gets the bot commands
+     *
+     * @return The bot commands
+     */
+    private List<BotCommand> getBotCommands() {
+        List<BotCommand> listOfCommands = new ArrayList<>(asList(
+                new BotCommand(START_COMMAND, "Запуск бота и авторегистрация пользователя"),
+                new BotCommand(HELP_COMMAND, "Помощь"),
+                new BotCommand(CITY_COMMAND, "Установить город пользователя"),
+                new BotCommand(WEATHER_COMMAND_1, "Погода в твоем городе"),
+                new BotCommand(MY_CURRENCY_COMMAND, "Установить валюту пользователя"),
+                new BotCommand(STOCK_QUOTE_COMMAND_1, "Курсы валют"),
+                new BotCommand(DEFAULT_STOCK_COMMAND_1, "Получить курс основных валют"),
+                new BotCommand(UNREGISTER_COMMAND, "Удалить аккаунт пользователя")
+        ));
+        return listOfCommands;
+    }
 }
