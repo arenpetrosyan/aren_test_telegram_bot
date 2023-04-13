@@ -283,7 +283,7 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
      * @param chat The Chat object of the user
      */
     private void startCommandReceived(Chat chat) {
-        String answer = String.format("Привет, {}! Добро пожаловать!", chat.getFirstName()) + parseToUnicode(":blush:");
+        String answer = String.format("Привет, {}! Добро пожаловать!" + parseToUnicode(":blush:"), chat.getFirstName());
         sendMessageAndShowMenu(chat, answer);
     }
 
@@ -483,7 +483,7 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
      * @return The bot commands
      */
     private List<BotCommand> getBotCommands() {
-        List<BotCommand> listOfCommands = new ArrayList<>(asList(
+        return new ArrayList<>(asList(
                 new BotCommand(START_COMMAND, "Запуск бота и авторегистрация пользователя"),
                 new BotCommand(HELP_COMMAND, "Помощь"),
                 new BotCommand(CITY_COMMAND, "Установить город пользователя"),
@@ -493,6 +493,5 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
                 new BotCommand(DEFAULT_STOCK_COMMAND_1, "Получить курс основных валют"),
                 new BotCommand(UNREGISTER_COMMAND, "Удалить аккаунт пользователя")
         ));
-        return listOfCommands;
     }
 }
