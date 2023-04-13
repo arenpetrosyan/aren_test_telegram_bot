@@ -465,7 +465,7 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
             user.setCurrency(currency);
             log.info("Setting currency of the user {}", user.getChatId());
             userRepository.save(user);
-            log.info("Currency of the user {} set to {}}", user.getChatId(), currency);
+            log.info("Currency of the user {} set to {}", user.getChatId(), currency);
             sendMessageAndShowMenu(chat, CURRENCY_CHANGE_SUCCESSFUL_TEXT);
         } else {
             sendMessage(chat.getId(), REGISTRATION_NEEDED_TEXT);
