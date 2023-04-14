@@ -41,34 +41,35 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
     private static final String WEATHER_COMMAND_2 = "Погода";
     private static final String STOCK_QUOTE_COMMAND_1 = "/stockqoute";
     private static final String STOCK_QUOTE_COMMAND_2 = "Курс валют";
-    private static final String CITY_COMMAND = "/city";
+    private static final String MY_CITY_COMMAND = "/mycity";
     private static final String UNREGISTER_COMMAND = "/unregister";
-    private static final String MY_CURRENCY_COMMAND = "/profilecurrency";
+    private static final String MY_CURRENCY_COMMAND = "/mycurrency";
     private static final String DEFAULT_STOCK_COMMAND_1 = "/defaultstock";
+    private static final String SETTINGS_COMMAND = "/settings";
     private static final String DEFAULT_STOCK_COMMAND_2 = "Курсы основных валют";
 
-    private static final String HELP_TEXT = """
-            Я могу помочь тебе с командами бота:
-            /start - запуск бота и авторегистрация пользователя"
-            /weather - узнать погоду в твоем городе
-            /stockqoute - получить курс валют
-            /unregister - удалить аккаунт пользователя
-            /city - установить город пользователя
-            /profilecurrency - установить валюту пользователя
-            /defaultstock - курс самых распрастраненных валют""";
+    private static final String HELP_TEXT = "Я могу помочь тебе с командами бота:\n" +
+                                            START_COMMAND + " - запуск бота и авторегистрация пользователя\n" +
+                                            MY_CITY_COMMAND + " - установить город пользователя\n" +
+                                            WEATHER_COMMAND_1 + " - узнать погоду в твоем городе\n" +
+                                            MY_CURRENCY_COMMAND + " - установить валюту пользователя\n" +
+                                            STOCK_QUOTE_COMMAND_1 + " - получить курс валют\n" +
+                                            DEFAULT_STOCK_COMMAND_1 + " - курс самых распрастраненных валют\n" +
+                                            SETTINGS_COMMAND + " - получить настройки профиля\n" +
+                                            UNREGISTER_COMMAND + " - удалить аккаунт пользователя\n";
 
     private static final String PROFILE_CURRENCY_TEXT = """
-            Введите валюту, которая будет сохранена в вашем профиле.
-            Используйте международные коды валют, например RUB, EUR или USD.
-            В дальнейшем курсы валют будут приводится к этой валюте.
-            Изменить его можно будет по команде /profilecurrency.""";
+                                                                Введите валюту, которая будет сохранена в вашем профиле.
+                                                                Используйте международные коды валют, например RUB, EUR или USD.
+                                                                В дальнейшем курсы валют будут приводится к этой валюте.
+                                                                Изменить его можно будет по команде""" + " " + MY_CURRENCY_COMMAND;
 
     private static final List<String> DEFAULT_CURRENCIES = asList("USD", "RUB", "EUR", "GBP", "JPY", "CNY");
     private static final String REGISTRATION_SUCCESSFUL_TEXT = "Пользователь зарегистрирован!" + parseToUnicode(":tada:");
     private static final String CURRENCY_CHANGE_SUCCESSFUL_TEXT = "Валюта пользователя успешно изменена!" + parseToUnicode(":tada:") + "\n" +
                                                                   "Введите код валюты, курс которой вы хотите увидеть.";
     private static final String CURRENCY_NEEDED_TEXT = "Введите код валюты, курс которой вы хотите увидеть." + parseToUnicode(":arrow_down:");
-    private static final String CITY_TEXT = parseToUnicode(":cityscape:") + "Напишите название города в формате 'город 'Ваш город'' без кавычек" + parseToUnicode(":arrow_down:");
+    private static final String CITY_TEXT = "Напишите название города в формате 'город 'Ваш город'' без кавычек" + parseToUnicode(":arrow_down:");
     private static final String REGISTRATION_NEEDED_TEXT = "Сначала надо зарегистрироваться! Нажмите команду /start" + parseToUnicode(":pray:");
     private static final String WRONG_CURRENCY_TEXT = "Эта валюта выбрана как основная." + parseToUnicode(":heavy_dollar_sign:") + "\n" +
                                                       "Выберите другую чтобы увидеть её курс к основной.";
@@ -120,7 +121,8 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
                 case MY_CURRENCY_COMMAND -> myCurrencyCommandReceived(chat);
                 case STOCK_QUOTE_COMMAND_1, STOCK_QUOTE_COMMAND_2 -> stockQuoteCommandReceived(chat);
                 case DEFAULT_STOCK_COMMAND_1, DEFAULT_STOCK_COMMAND_2 -> defaultStockCommandReceived(chat);
-                case CITY_COMMAND -> cityCommandReceived(chat);
+                case MY_CITY_COMMAND -> cityCommandReceived(chat);
+                case SETTINGS_COMMAND -> settingsCommandReceived(chat);
                 default -> {
                     if (text.toLowerCase().startsWith("город ")) {
                         handleCityMessages(chat, text);
@@ -131,6 +133,23 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Handles the /settings command
+     *
+     * @param chat The Chat object of the user
+     */
+    private void settingsCommandReceived(Chat chat) {
+        if (userIsPresent(chat.getId())) {
+            User user = userRepository.findById(chat.getId()).get();
+            String answer = "Пользователь: " + user.getUserName() + "\n" +
+                            "Валюта: " + user.getCurrency() + "\n" +
+                            "Город: " + user.getCity();
+            sendMessage(chat.getId(), answer);
+        } else {
+            sendMessage(chat.getId(), REGISTRATION_NEEDED_TEXT);
         }
     }
 
@@ -178,6 +197,9 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
      */
     private void myCurrencyCommandReceived(Chat chat) {
         if (userIsPresent(chat.getId())) {
+            User user = userRepository.findById(chat.getId()).get();
+            user.setCurrency(null);
+            userRepository.save(user);
             sendMessage(chat.getId(), PROFILE_CURRENCY_TEXT);
         } else {
             sendMessage(chat.getId(), REGISTRATION_NEEDED_TEXT);
@@ -235,6 +257,9 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
      */
     private void cityCommandReceived(Chat chat) {
         if (userIsPresent(chat.getId())) {
+            User user = userRepository.findById(chat.getId()).get();
+            user.setCity(null);
+            userRepository.save(user);
             sendMessage(chat.getId(), CITY_TEXT);
         } else {
             sendMessage(chat.getId(), REGISTRATION_NEEDED_TEXT);
@@ -283,7 +308,7 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
      * @param chat The Chat object of the user
      */
     private void startCommandReceived(Chat chat) {
-        String answer = String.format("Привет, {}! Добро пожаловать!" + parseToUnicode(":blush:"), chat.getFirstName());
+        String answer = String.format("Привет, %s! Добро пожаловать!%s", chat.getFirstName(), parseToUnicode(":blush:"));
         sendMessageAndShowMenu(chat, answer);
     }
 
@@ -402,8 +427,8 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
      */
     private void registerUser(Chat chat) {
         if (!userIsPresent(chat.getId())) {
-            User user = createUser(chat.getId(), chat);
-            sendMessage(user.getChatId(), REGISTRATION_SUCCESSFUL_TEXT);
+            createUser(chat.getId(), chat);
+            sendMessageAndShowMenu(chat, REGISTRATION_SUCCESSFUL_TEXT);
         }
     }
 
@@ -436,10 +461,11 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
             User user = userRepository.findById(chat.getId()).get();
             if (user.getCity() == null) {
                 log.info("Setting city of the user {}", user.getChatId());
-                user.setCity(text);
+                String toUpperCase = text.substring(0, 1).toUpperCase() + text.substring(1);
+                user.setCity(toUpperCase);
                 userRepository.save(user);
-                log.info("City of the user {} city set to {}}", user.getChatId(), text);
-                sendMessage(chat.getId(), parseToUnicode(":cityscape:") + "Город установлен: " + text);
+                log.info("City of the user {} city set to {}", user.getChatId(), toUpperCase);
+                sendMessage(chat.getId(), parseToUnicode(":cityscape:") + "Город установлен: " + toUpperCase);
                 weatherCommandReceived(chat);
             }
         }
@@ -486,11 +512,12 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
         return new ArrayList<>(asList(
                 new BotCommand(START_COMMAND, "Запуск бота и авторегистрация пользователя"),
                 new BotCommand(HELP_COMMAND, "Помощь"),
-                new BotCommand(CITY_COMMAND, "Установить город пользователя"),
+                new BotCommand(MY_CITY_COMMAND, "Установить город пользователя"),
                 new BotCommand(WEATHER_COMMAND_1, "Погода в твоем городе"),
                 new BotCommand(MY_CURRENCY_COMMAND, "Установить валюту пользователя"),
                 new BotCommand(STOCK_QUOTE_COMMAND_1, "Курсы валют"),
                 new BotCommand(DEFAULT_STOCK_COMMAND_1, "Получить курс основных валют"),
+                new BotCommand(SETTINGS_COMMAND, "Посмотреть настройки пользователя"),
                 new BotCommand(UNREGISTER_COMMAND, "Удалить аккаунт пользователя")
         ));
     }

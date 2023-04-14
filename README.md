@@ -29,8 +29,8 @@ The bot supports the following commands:
 - `/weather` : Gets the current weather for the user's registered city.
 - `/stock_quote` : Fetches the currency exchange rate for the user's registered currency.
 - `/unregister` : Deletes the user's account.
-- `/city` : Sets the user's city.
-- `/my_currency` : Sets the user's currency.
+- `/mycity` : Sets the user's city.
+- `/mycurrency` : Sets the user's currency.
 - `/default_stock` : Gets the exchange rate for the main currencies.
-
+- `/settings` : Shows the user's settings'
  Send a command and follow instructions if needed.
