@@ -13,10 +13,13 @@ import java.net.URL;
 @Component
 public class WeatherRestMap {
 
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private BotConfig config;
+    private final RestTemplate restTemplate;
+    private final BotConfig config;
+
+    public WeatherRestMap(RestTemplate restTemplate, BotConfig config) {
+        this.restTemplate = restTemplate;
+        this.config = config;
+    }
 
     /**
      * Method to get the current weather for a given city

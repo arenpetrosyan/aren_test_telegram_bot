@@ -18,10 +18,13 @@ import java.util.stream.Collectors;
 @Component
 public class CurrencyRestMap {
 
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private BotConfig config;
+    private final RestTemplate restTemplate;
+    private final BotConfig config;
+
+    public CurrencyRestMap(RestTemplate restTemplate, BotConfig config) {
+        this.restTemplate = restTemplate;
+        this.config = config;
+    }
 
     /**
      * Get currency rate for given from and to currencies
