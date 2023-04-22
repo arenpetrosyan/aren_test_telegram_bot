@@ -437,9 +437,8 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
      *
      * @param chatId The chat id of the user
      * @param chat   The chat object of the user
-     * @return The created user object
      */
-    private User createUser(Long chatId, Chat chat) {
+    private void createUser(Long chatId, Chat chat) {
         User user = new User();
         user.setChatId(chatId);
         user.setFirstName(chat.getFirstName());
@@ -447,7 +446,6 @@ public class TelegramDemoBot extends TelegramLongPollingBot {
         user.setUserName(chat.getUserName());
         userRepository.save(user);
         log.info("User created: " + user);
-        return user;
     }
 
     /**
