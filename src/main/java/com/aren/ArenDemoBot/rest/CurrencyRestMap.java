@@ -2,7 +2,6 @@ package com.aren.ArenDemoBot.rest;
 
 import com.aren.ArenDemoBot.config.BotConfig;
 import com.aren.ArenDemoBot.model.Currency;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -18,11 +17,11 @@ import java.util.stream.Collectors;
 @Component
 public class CurrencyRestMap {
 
-    private final RestTemplate restTemplate;
+    private static RestTemplate restTemplate;
     private final BotConfig config;
 
     public CurrencyRestMap(RestTemplate restTemplate, BotConfig config) {
-        this.restTemplate = restTemplate;
+        CurrencyRestMap.restTemplate = restTemplate;
         this.config = config;
     }
 
@@ -71,7 +70,7 @@ public class CurrencyRestMap {
     /**
      * Set converters for RestTemplate
      */
-    private void setConverters() {
+    private static void setConverters() {
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
